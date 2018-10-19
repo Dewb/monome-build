@@ -1,53 +1,26 @@
-FROM ubuntu:18.04 as builder
+FROM ubuntu:18.04
 LABEL maintainer="Michael Dewberry (dewb)"
 LABEL description="Builder image for monome AVR32-based eurorack modules"
 
-# Install cross-compiler prerequisites
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    curl \
-    flex \
-    bison \
-    libgmp3-dev \
-    libmpfr-dev \
-    autoconf \
-    build-essential \
-    libncurses5-dev \
-    libmpc-dev \
-    texinfo \
-    git \
-    gawk \
-    file \
-    zlib1g-dev \
-    unzip \
-    ca-certificates 
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y apt-utils build-essential && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y -f tzdata && \
+    apt-get install --no-install-recommends -y \
+        ragel \
+        python3 \
+        python3-pip \
+        python3-setuptools \
+        pandoc \
+        locales \
+        texlive-xetex \
+        latexmk \
+        git \
+        curl
 
-# Build cross-compiler
-WORKDIR /cross
-RUN git clone https://github.com/denravonska/avr32-toolchain
-
-WORKDIR /cross/avr32-toolchain
-RUN PREFIX=/avr32-tools make install-cross
-
-# Start second stage
-FROM ubuntu:18.04
-
-# Get the cross-compiler tools from the previous stage
-COPY --from=builder /avr32-tools /avr32-tools
+# Install the cross-compiler tools
+WORKDIR /avr32-tools
+RUN curl http://ww1.microchip.com/downloads/archive/avr32-gnu-toolchain-3.4.3.820-linux.any.x86_64.tar.gz | gzip -dc | tar -xv --strip-components 1
 ENV PATH="/avr32-tools/bin:${PATH}"
-
-# Other monome build tools and prerequisites
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -f tzdata
-RUN apt-get install -y \
-   ragel \
-   python3 \
-   python3-pip \
-   pandoc \
-   locales \
-   texlive-xetex \
-   latexmk \
-   git
 
 # Install python modules
 RUN pip3 install \
