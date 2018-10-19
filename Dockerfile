@@ -1,10 +1,9 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 as builder
 LABEL maintainer="Michael Dewberry (dewb)"
 LABEL description="Builder image for monome AVR32-based eurorack modules"
 
 # Install cross-compiler prerequisites
-RUN apt-get update 
-RUN apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
     flex \
     bison \
@@ -28,10 +27,17 @@ RUN git clone https://github.com/denravonska/avr32-toolchain
 
 WORKDIR /cross/avr32-toolchain
 RUN PREFIX=/avr32-tools make install-cross
+
+# Start second stage
+FROM ubuntu:18.04
+
+# Get the cross-compiler tools from the previous stage
+COPY --from=builder /avr32-tools /avr32-tools
 ENV PATH="/avr32-tools/bin:${PATH}"
 
 # Other monome build tools and prerequisites
-RUN apt-get install -y apt-utils
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -f tzdata
 RUN apt-get install -y \
    ragel \
@@ -40,7 +46,8 @@ RUN apt-get install -y \
    pandoc \
    locales \
    texlive-xetex \
-   latexmk
+   latexmk \
+   git
 
 # Install python modules
 RUN pip3 install \

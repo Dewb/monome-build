@@ -7,7 +7,7 @@ To build Teletype on a Linux or OS X machine, with no prerequisites other than D
 ```
 git clone https://github.com/monome/teletype
 cd teletype
-git submodule update --init  --recursive
+git submodule update --init --recursive
 docker run -v $(pwd):/target -t dewb/monome-build 
 ```
 
@@ -15,7 +15,7 @@ Or to build ansible/whitewhale/earthsea/meadowphysics, which require an extra ar
 ```
 git clone https://github.com/monome/ansible
 cd ansible
-git submodule update --init  --recursive
+git submodule update --init --recursive
 docker run -v $(pwd):/target -t dewb/monome-build "cd src; make"
 ```
 
