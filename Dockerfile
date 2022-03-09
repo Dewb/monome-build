@@ -1,9 +1,10 @@
-FROM ubuntu:18.04 as builder
+FROM ubuntu:20.04 as builder
 LABEL maintainer="Michael Dewberry (dewb)"
 LABEL description="Builder image for monome AVR32-based eurorack modules"
 
 # Install cross-compiler prerequisites
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN DEBIAN_FRONTEND=noninteractive apt update && apt install -y -f tzdata
+RUN apt install --no-install-recommends -y \
     curl \
     flex \
     bison \
@@ -26,20 +27,21 @@ WORKDIR /cross
 RUN git clone https://github.com/denravonska/avr32-toolchain
 
 WORKDIR /cross/avr32-toolchain
+RUN sed -i "s|ftp://sources.redhat.com/pub/newlib/|http://www.sourceware.org/pub/newlib/|" Makefile
 RUN PREFIX=/avr32-tools make install-cross
 
 # Start second stage
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 # Get the cross-compiler tools from the previous stage
 COPY --from=builder /avr32-tools /avr32-tools
 ENV PATH="/avr32-tools/bin:${PATH}"
 
 # Other monome build tools and prerequisites
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt update && apt install --no-install-recommends -y \
     apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -f tzdata
-RUN apt-get install -y \
+RUN apt install -y \
    ragel \
    python3 \
    python3-pip \
@@ -47,7 +49,8 @@ RUN apt-get install -y \
    locales \
    texlive-xetex \
    latexmk \
-   git
+   git \
+   clang-format
 
 # Install python modules
 RUN pip3 install \
