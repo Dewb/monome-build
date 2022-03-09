@@ -3,8 +3,8 @@ LABEL maintainer="Michael Dewberry (dewb)"
 LABEL description="Builder image for monome AVR32-based eurorack modules"
 
 # Install cross-compiler prerequisites
-RUN DEBIAN_FRONTEND=noninteractive apt update && apt install -y -f tzdata
-RUN apt install --no-install-recommends -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y -f tzdata
+RUN apt-get install --no-install-recommends -y \
     curl \
     flex \
     bison \
@@ -38,10 +38,10 @@ COPY --from=builder /avr32-tools /avr32-tools
 ENV PATH="/avr32-tools/bin:${PATH}"
 
 # Other monome build tools and prerequisites
-RUN apt update && apt install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
     apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -f tzdata
-RUN apt install -y \
+RUN apt-get install -y --no-install-recommends \
    ragel \
    python3 \
    python3-pip \
@@ -49,14 +49,19 @@ RUN apt install -y \
    locales \
    texlive-xetex \
    latexmk \
+   lmodern \
+   texlive-fonts-recommended \
+   texlive-plain-generic \
    git \
+   build-essential \
+   zip \
    clang-format
 
 # Install python modules
 RUN pip3 install \
     jinja2 \
     pypandoc \
-    pytoml 
+    pytoml
 
 # Make sure shell and Python encoding are set to UTF-8
 RUN locale-gen en_US.UTF-8
