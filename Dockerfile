@@ -31,7 +31,7 @@ RUN sed -i "s|ftp://sources.redhat.com/pub/newlib/|http://www.sourceware.org/pub
 RUN PREFIX=/avr32-tools make install-cross
 
 # Start second stage
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Get the cross-compiler tools from the previous stage
 COPY --from=builder /avr32-tools /avr32-tools
@@ -70,6 +70,9 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 ENV LC_CTYPE=en_US.UTF-8
 ENV PYTHONIOENCODING=utf-8
+
+# avoid "dubious ownership" error
+RUN git config --global --add safe.directory /target
 
 WORKDIR /target
 ENTRYPOINT ["/bin/bash", "-c"]
