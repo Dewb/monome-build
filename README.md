@@ -33,7 +33,7 @@ git submodule update --init --recursive
 docker run -v $(pwd):/target -t dewb/monome-build "cd src; make"
 ```
 
-Some other useful commands are `"make clean"` (or `"cd src; make clean"`) to clean build products, or `"clang-format -i **/*.[ch]"` to format source with clang-format.
+Some other useful commands are `"make clean"` (or `"cd src; make clean"`) to clean build products, or `"make format"` to format source with clang-format.
 
 If you would prefer a shell inside the container to run multiple commands, provide the command `bash` (or your preferred shell) and add the `-i` flag to connect to the interactive console.
 
@@ -65,7 +65,7 @@ git submodule update --init --recursive
 nerdctl run -v $(pwd):/target -t dewb/monome-build "cd src; make"
 ```
 
-Some other useful commands are `"make clean"` (or `"cd src; make clean"`) to clean build products, or `"clang-format -i **/*.[ch]"` to format source with clang-format.
+Some other useful commands are `"make clean"` (or `"cd src; make clean"`) to clean build products, or `"make format"` to format source with clang-format.
 
 If you would prefer a shell inside the container to run multiple commands, provide the command `bash` (or your preferred shell) and add the `-i` flag to connect to the interactive console.
 
